@@ -1,0 +1,97 @@
+╔══════════════════════════════════════════════════════════════════╗
+║        SEED BLOCK ALGORITHM - COMPLETE SETUP GUIDE              ║
+║        Follow these steps EXACTLY in order                       ║
+╚══════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1: Install Java JDK 17
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Go to: https://adoptium.net/
+2. Click "Latest LTS Release" (Temurin 17)
+3. Download the Windows MSI installer
+4. Run the installer and click Next through everything
+5. Verify by opening Command Prompt and typing:
+       java -version
+   You should see: openjdk version "17..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2: Install Apache Maven
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Go to: https://maven.apache.org/download.cgi
+2. Download "Binary zip archive" (apache-maven-3.9.x-bin.zip)
+3. Extract it to C:\Program Files\Maven
+4. Add to PATH:
+   - Press Win + R, type: sysdm.cpl, press Enter
+   - Click "Advanced" tab → "Environment Variables"
+   - Under "System variables" click "Path" → "Edit"
+   - Click "New" and add: C:\Program Files\Maven\apache-maven-3.9.x\bin
+   - Click OK everywhere
+5. Verify by opening NEW Command Prompt and typing:
+       mvn -version
+   You should see: Apache Maven 3.9...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3: Set Up MySQL Database
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Open MySQL Command Line (or MySQL Workbench)
+2. Login with your root password
+3. Run this command:
+       CREATE DATABASE sba_db;
+4. You're done! The app will create all tables automatically.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 4: Configure Your MySQL Password
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Open this file in Notepad:
+   seed-block-algorithm\src\main\resources\application.properties
+2. Find this line:
+   spring.datasource.password=YOUR_MYSQL_PASSWORD_HERE
+3. Replace YOUR_MYSQL_PASSWORD_HERE with your actual MySQL password
+4. Save the file
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 5: Run the Application
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Option A (Easiest): Double-click "run.bat"
+
+Option B (Manual):
+1. Open Command Prompt
+2. Navigate to project folder:
+       cd path\to\seed-block-algorithm
+3. Run:
+       mvn spring-boot:run
+4. Wait for "Started SbaApplication" message (first time ~3-5 minutes)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 6: Use the Application
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Open your browser
+2. Go to: http://localhost:8080
+3. Register a new account
+4. Upload files, Download, and Recover!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Problem: "Access denied for user root"
+Solution: Check your MySQL password in application.properties
+
+Problem: "Port 8080 is already in use"
+Solution: Stop other applications or change server.port in application.properties
+
+Problem: Maven not found
+Solution: Restart Command Prompt after adding Maven to PATH
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HOW THE ALGORITHM WORKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. When you REGISTER → Seed Block is created:
+   Seed = ClientID ⊕ RandomNumber
+
+2. When you UPLOAD a file → File is backed up:
+   File' = OriginalFile ⊕ SeedBlock
+   (File' is stored on Remote Backup Server)
+
+3. When you RECOVER → Original file is restored:
+   OriginalFile = File' ⊕ SeedBlock
+   (This simulates recovering when Main Cloud fails)

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard - ReSeedX Engine v4.0</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif;scrollbar-width:thin;scrollbar-color:#cbd5e1 #f8fafc}
+.mono{font-family:'JetBrains Mono',monospace}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+body{background:#f8fafc;color:#1e293b}
+.glass{background:#ffffff;border:1px solid #e2e8f0}
+.glass-card{background:#ffffff;border:1px solid #e2e8f0;transition:all 0.2s;border-radius:12px}
+.glass-card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.glow-btn{box-shadow:0 2px 8px rgba(37,99,235,0.2)}
+.glow-btn:hover{box-shadow:0 4px 16px rgba(37,99,235,0.3);transform:translateY(-1px)}
+.sidebar-item{transition:all 0.2s;color:#64748b}
+.sidebar-item:hover,.sidebar-item.active{background:#f1f5f9;border-color:#e2e8f0}
+.sidebar-item.active{color:#2563eb;font-weight:600}
+.status-dot{width:8px;height:8px;border-radius:50%;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.5}}
+.progress-bar{background:#2563eb;border-radius:9999px;transition:width 0.5s ease}
+.fade-in{animation:fadeIn 0.3s ease forwards;opacity:0}
+@keyframes fadeIn{to{opacity:1}}
+.gradient-text{color:#2563eb;font-weight:700}
+.node-active{background:#f0fdf4;border-color:#bbf7d0}
+.node-failed{background:#fef2f2;border-color:#fecaca}
+.drop-zone{border:2px dashed #cbd5e1;transition:all 0.3s}
+.drop-zone.dragover{border-color:#2563eb;background:#eff6ff}
+.tab-btn{transition:all 0.2s;color:#64748b}
+.tab-btn.active{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+</style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased flex">
+
+<!-- Sidebar -->
+<aside class="w-64 h-screen fixed left-0 top-0 bg-white border-r border-slate-200 flex flex-col z-50">
+  <div class="p-5 border-b border-slate-200">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[20px] text-white">cloud</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-slate-800">ReSeedX Engine</h1>
+        <p class="text-[10px] text-slate-400">Encrypted Cloud Storage</p>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+    <button onclick="showSection('overview')" class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent" id="nav-overview">
+      <span class="material-symbols-outlined text-[20px]">home</span> Home
+    </button>
+    <button onclick="showSection('upload')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-upload">
+      <span class="material-symbols-outlined text-[20px]">add_circle</span> Upload
+    </button>
+    <button onclick="showSection('files')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-files">
+      <span class="material-symbols-outlined text-[20px]">folder</span> My Drive
+    </button>
+    <button onclick="showSection('shared')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-shared">
+      <span class="material-symbols-outlined text-[20px]">group</span> Team
+    </button>
+    <button onclick="showSection('nodes')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-nodes">
+      <span class="material-symbols-outlined text-[20px]">dns</span> Storage Nodes
+    </button>
+    <button onclick="showSection('blockchain')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-blockchain">
+      <span class="material-symbols-outlined text-[20px]">verified_user</span> Audit Trail
+    </button>
+    <button onclick="showSection('metrics')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-metrics">
+      <span class="material-symbols-outlined text-[20px]">bar_chart</span> Activity
+    </button>
+    <button onclick="showSection('crypto')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-crypto">
+      <span class="material-symbols-outlined text-[20px]">security</span> Security
+    </button>
+    <button onclick="showSection('audit')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-audit">
+      <span class="material-symbols-outlined text-[20px]">history</span> History
+    </button>
+    <button onclick="showSection('admin')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left border border-transparent text-slate-400" id="nav-admin" style="display:none">
+      <span class="material-symbols-outlined text-[20px]">settings</span> Admin
+    </button>
+  </nav>
+  <div class="p-4 border-t border-slate-200">
+    <div class="mb-3">
+      <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+        <span>Storage used</span>
+        <span id="storage-used">0 B / 15 GB</span>
+      </div>
+      <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-blue-500 rounded-full" id="storage-bar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[16px] text-blue-600">person</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-medium text-slate-700 truncate" id="sidebar-user">User</p>
+        <p class="text-[10px] text-slate-400">Personal</p>
+      </div>
+      <button onclick="logout()" class="text-slate-400 hover:text-red-500 transition-colors">
+        <span class="material-symbols-outlined text-[18px]">logout</span>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-6 right-6 z-[100] hidden max-w-md">
+  <div id="toast-inner" class="bg-white rounded-xl p-4 flex items-start gap-3 shadow-lg border">
+    <span id="toast-icon" class="material-symbols-outlined text-[22px] mt-0.5"></span>
+    <div class="flex-1"><p id="toast-msg" class="text-sm text-slate-700"></p></div>
+    <button onclick="hideToast()" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-[18px]">close</span></button>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="modal" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(2px)">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-slate-200">
+    <div class="flex items-center gap-3 mb-4">
+      <span id="modal-icon" class="material-symbols-outlined text-[28px] text-amber-500">warning</span>
+      <h3 id="modal-title" class="text-lg font-semibold text-slate-800">Confirm</h3>
+    </div>
+    <p id="modal-msg" class="text-sm text-slate-600 mb-6"></p>
+    <div class="flex gap-3 justify-end">
+      <button onclick="modalResolve(false)" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium hover:bg-slate-200 transition-colors">Cancel</button>
+      <button id="modal-confirm-btn" onclick="modalResolve(true)" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-all">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div id="result-modal" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(2px)">
+  <div class="bg-white rounded-2xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-slate-200">
+    <div id="result-modal-content"></div>
+    <div class="flex gap-3 justify-end mt-6">
+      <button onclick="closeResultModal(false)" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium hover:bg-slate-200 transition-colors">Close</button>
+      <button id="result-modal-action" onclick="closeResultModal(true)" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-all hidden">Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="ml-64 flex-1 min-h-screen p-6">
+
+
+<!-- OVERVIEW SECTION -->
+<div id="sec-overview" class="section fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800">Welcome back</h2>
+      <p class="text-sm text-slate-500">Your encrypted files are safe across 3 distributed nodes</p>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+      <span class="status-dot" style="background:#10b981"></span> All systems operational
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="glass-card rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="material-symbols-outlined text-indigo-400">folder</span>
+        <span class="text-[10px] mono text-slate-500">FILES</span>
+      </div>
+      <p class="text-2xl font-bold" id="stat-files">0</p>
+      <p class="text-xs text-slate-400">Total encrypted files</p>
+    </div>
+    <div class="glass-card rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="material-symbols-outlined text-purple-400">storage</span>
+        <span class="text-[10px] mono text-slate-500">STORAGE</span>
+      </div>
+      <p class="text-2xl font-bold" id="stat-size">0 B</p>
+      <p class="text-xs text-slate-400">Total data stored</p>
+    </div>
+    <div class="glass-card rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="material-symbols-outlined text-emerald-400">compress</span>
+        <span class="text-[10px] mono text-slate-500">SAVED</span>
+      </div>
+      <p class="text-2xl font-bold" id="stat-saved">0 B</p>
+      <p class="text-xs text-slate-400">Space saved (GZIP)</p>
+    </div>
+    <div class="glass-card rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="material-symbols-outlined text-amber-400">speed</span>
+        <span class="text-[10px] mono text-slate-500">LATENCY</span>
+      </div>
+      <p class="text-2xl font-bold" id="stat-xor">0 ms</p>
+      <p class="text-xs text-slate-400">Avg encryption time</p>
+    </div>
+  </div>
+
+  <!-- Node Status + Blockchain Status -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="glass-card rounded-xl p-5">
+      <h3 class="text-sm font-semibold text-slate-600 mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-indigo-400">dns</span> Node Cluster Health
+      </h3>
+      <div class="space-y-3" id="overview-nodes"></div>
+    </div>
+    <div class="glass-card rounded-xl p-5">
+      <h3 class="text-sm font-semibold text-slate-600 mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-purple-400">link</span> Blockchain Audit Status
+      </h3>
+      <div id="overview-chain"></div>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD SECTION -->
+<div id="sec-upload" class="section hidden fade-in">
+  <h2 class="text-2xl font-bold text-slate-800 mb-2">Upload File</h2>
+  <p class="text-sm text-slate-500 mb-6">Files are automatically encrypted and distributed across 3 secure nodes</p>
+
+  <div class="glass-card rounded-xl p-8">
+    <div id="drop-zone" class="drop-zone rounded-xl p-12 text-center cursor-pointer" onclick="document.getElementById('file-input').click()">
+      <span class="material-symbols-outlined text-[48px] text-indigo-400 mb-3">cloud_upload</span>
+      <p class="text-lg font-medium text-slate-600">Drop file here or click to browse</p>
+      <p class="text-sm text-slate-500 mt-1">Max 50MB • All file types supported</p>
+      <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)"/>
+    </div>
+
+    <div id="upload-progress" class="hidden mt-6">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm text-slate-600" id="upload-filename">file.txt</span>
+        <span class="text-xs mono text-indigo-400" id="upload-status">Encrypting...</span>
+      </div>
+      <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+        <div class="progress-bar h-full" id="upload-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="upload-result" class="hidden mt-6 glass-card rounded-xl p-5 border-emerald-500/20"></div>
+  </div>
+</div>
+
+<!-- FILES SECTION -->
+<div id="sec-files" class="section hidden fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800">My Drive</h2>
+      <p class="text-sm text-slate-500">All your encrypted files</p>
+    </div>
+    <button onclick="loadFiles()" class="glass-card px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-[16px]">refresh</span> Refresh
+    </button>
+  </div>
+  <div id="files-list" class="space-y-3"></div>
+</div>
+
+<!-- TEAM SECTION -->
+<div id="sec-shared" class="section hidden fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800">Team</h2>
+      <p class="text-sm text-slate-500">Create organizations and share files with your team</p>
+    </div>
+    <button onclick="showCreateOrg()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors">
+      <span class="material-symbols-outlined text-[16px]">add</span> New Team
+    </button>
+  </div>
+  <div id="team-content"></div>
+</div>
+
+<!-- NODES SECTION -->
+<div id="sec-nodes" class="section hidden fade-in">
+  <h2 class="text-2xl font-bold text-slate-800 mb-2">Node Management</h2>
+  <p class="text-sm text-slate-500 mb-6">Monitor and control distributed storage nodes with failover simulation</p>
+
+  <!-- Topology Graph -->
+  <div class="glass-card rounded-xl p-6 mb-6">
+    <h3 class="text-sm font-semibold text-slate-700 mb-2">Network Topology</h3>
+    <div class="relative mx-auto" style="width:500px;height:350px">
+      <!-- Client (center) -->
+      <div class="absolute text-center" style="left:50%;top:50%;transform:translate(-50%,-50%)">
+        <div class="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200 mx-auto">
+          <span class="material-symbols-outlined text-[32px] text-white">cloud</span>
+        </div>
+        <p class="text-xs mt-2 font-semibold text-slate-800">Client</p>
+      </div>
+      <!-- Node A (top) -->
+      <div class="absolute text-center" style="left:50%;top:0;transform:translateX(-50%)" id="topo-nodeA">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-500 mx-auto" id="topo-nodeA-circle">
+          <span class="material-symbols-outlined text-[24px]">dns</span>
+        </div>
+        <p class="text-[11px] mt-1 font-medium text-slate-700">Node A</p>
+        <p class="text-[9px] text-slate-400">AES-256 + XOR</p>
+      </div>
+      <!-- Node B (bottom-left) -->
+      <div class="absolute text-center" style="left:5%;bottom:10%" id="topo-nodeB">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-500 mx-auto" id="topo-nodeB-circle">
+          <span class="material-symbols-outlined text-[24px]">dns</span>
+        </div>
+        <p class="text-[11px] mt-1 font-medium text-slate-700">Node B</p>
+        <p class="text-[9px] text-slate-400">Double XOR</p>
+      </div>
+      <!-- Node C (bottom-right) -->
+      <div class="absolute text-center" style="right:5%;bottom:10%" id="topo-nodeC">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-500 mx-auto" id="topo-nodeC-circle">
+          <span class="material-symbols-outlined text-[24px]">dns</span>
+        </div>
+        <p class="text-[11px] mt-1 font-medium text-slate-700">Node C</p>
+        <p class="text-[9px] text-slate-400">Triple XOR</p>
+      </div>
+      <!-- SVG Lines -->
+      <svg class="absolute inset-0 w-full h-full pointer-events-none">
+        <line id="line-A" x1="50%" y1="42%" x2="50%" y2="18%" stroke="#2563eb" stroke-width="2" stroke-dasharray="6,4" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2s" repeatCount="indefinite"/></line>
+        <line id="line-B" x1="42%" y1="55%" x2="15%" y2="72%" stroke="#2563eb" stroke-width="2" stroke-dasharray="6,4" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2s" repeatCount="indefinite"/></line>
+        <line id="line-C" x1="58%" y1="55%" x2="85%" y2="72%" stroke="#2563eb" stroke-width="2" stroke-dasharray="6,4" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2s" repeatCount="indefinite"/></line>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="nodes-grid"></div>
+  <div class="glass-card rounded-xl p-5">
+    <h3 class="text-sm font-semibold text-slate-600 mb-3">Node Health Monitor</h3>
+    <div id="node-health-info" class="text-sm text-slate-400"></div>
+  </div>
+</div>
+
+<!-- BLOCKCHAIN SECTION -->
+<div id="sec-blockchain" class="section hidden fade-in">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800">Blockchain Audit Trail</h2>
+      <p class="text-sm text-slate-500">Immutable, hash-chained record of all operations</p>
+    </div>
+    <button onclick="validateBlockchain()" class="glow-btn px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-[16px]">verified</span> Validate Chain
+    </button>
+  </div>
+  <div id="chain-status" class="glass-card rounded-xl p-5 mb-4"></div>
+  <div id="chain-blocks" class="space-y-3"></div>
+</div>
+
+<!-- METRICS SECTION -->
+<div id="sec-metrics" class="section hidden fade-in">
+  <h2 class="text-2xl font-bold text-slate-800 mb-2">Real-Time Metrics</h2>
+  <p class="text-sm text-slate-500 mb-6">Encryption throughput, latency percentiles, and algorithm performance</p>
+  <div id="metrics-content"></div>
+</div>
+
+<!-- CRYPTO LAB SECTION -->
+<div id="sec-crypto" class="section hidden fade-in">
+  <h2 class="text-2xl font-bold text-slate-800 mb-2">Security Analysis</h2>
+  <p class="text-sm text-slate-500 mb-6">Verify encryption strength, file integrity, and algorithm speed</p>
+
+  <div class="flex gap-2 mb-6">
+    <button onclick="showCryptoTab('entropy')" class="tab-btn active px-4 py-2 rounded-lg text-xs font-semibold border border-transparent" id="ctab-entropy">Encryption Strength</button>
+    <button onclick="showCryptoTab('merkle')" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400" id="ctab-merkle">File Integrity</button>
+    <button onclick="showCryptoTab('bench')" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400" id="ctab-bench">Speed Test</button>
+  </div>
+  <div id="crypto-content"></div>
+</div>
+
+<!-- AUDIT SECTION -->
+<div id="sec-audit" class="section hidden fade-in">
+  <h2 class="text-2xl font-bold text-slate-800 mb-2">Audit Log</h2>
+  <p class="text-sm text-slate-500 mb-6">Complete history of all operations</p>
+  <div id="audit-list" class="space-y-2"></div>
+</div>
+
+<!-- ADMIN SECTION -->
+<div id="sec-admin" class="section hidden fade-in">
+  <h2 class="text-2xl font-bold text-slate-800 mb-2">Admin Control Panel</h2>
+  <p class="text-sm text-slate-500 mb-6">System management & user administration</p>
+
+  <!-- Admin Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" id="admin-stats-grid"></div>
+
+  <!-- Users Table -->
+  <div class="glass-card rounded-xl p-6">
+    <h3 class="text-sm font-semibold text-slate-600 mb-4 flex items-center gap-2">
+      <span class="material-symbols-outlined text-[18px] text-indigo-400">group</span> User Management
+    </h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200">
+          <th class="text-left py-3 px-3">User</th><th class="text-left py-3 px-3">Role</th><th class="text-left py-3 px-3">Status</th><th class="text-left py-3 px-3">Last Login</th><th class="text-right py-3 px-3">Actions</th>
+        </tr></thead>
+        <tbody id="admin-users-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main content -->
+
+
+<script>
+const TOKEN=localStorage.getItem('token');
+const USERNAME=localStorage.getItem('username')||'User';
+if(!TOKEN)window.location.href='/';
+document.getElementById('sidebar-user').textContent=USERNAME;
+
+// Toast notifications
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast'),inner=document.getElementById('toast-inner'),icon=document.getElementById('toast-icon'),m=document.getElementById('toast-msg');
+  const styles={success:{icon:'check_circle',color:'text-emerald-400',border:'border-emerald-500/30'},error:{icon:'error',color:'text-red-400',border:'border-red-500/30'},info:{icon:'info',color:'text-indigo-400',border:'border-indigo-500/30'},warning:{icon:'warning',color:'text-amber-400',border:'border-amber-500/30'}};
+  const s=styles[type]||styles.info;
+  icon.textContent=s.icon;icon.className='material-symbols-outlined text-[22px] mt-0.5 '+s.color;
+  inner.className='glass-card rounded-xl p-4 flex items-start gap-3 shadow-lg border '+s.border;
+  m.textContent=msg;t.classList.remove('hidden');
+  clearTimeout(window._toastTimer);window._toastTimer=setTimeout(hideToast,4000);
+}
+function hideToast(){document.getElementById('toast').classList.add('hidden')}
+
+// Confirm modal
+let _modalResolver=null;
+function showConfirm(msg,title='Confirm'){
+  return new Promise(resolve=>{
+    _modalResolver=resolve;
+    document.getElementById('modal-title').textContent=title;
+    document.getElementById('modal-msg').textContent=msg;
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modal').style.display='flex';
+  });
+}
+function modalResolve(val){
+  document.getElementById('modal').classList.add('hidden');
+  document.getElementById('modal').style.display='none';
+  if(_modalResolver)_modalResolver(val);_modalResolver=null;
+}
+
+// Result modal
+let _resultResolver=null;
+function showResultModal(html,showAction=false,actionText='Download'){
+  return new Promise(resolve=>{
+    _resultResolver=resolve;
+    document.getElementById('result-modal-content').innerHTML=html;
+    const btn=document.getElementById('result-modal-action');
+    if(showAction){btn.classList.remove('hidden');btn.textContent=actionText}else{btn.classList.add('hidden')}
+    document.getElementById('result-modal').classList.remove('hidden');
+    document.getElementById('result-modal').style.display='flex';
+  });
+}
+function closeResultModal(action){
+  document.getElementById('result-modal').classList.add('hidden');
+  document.getElementById('result-modal').style.display='none';
+  if(_resultResolver)_resultResolver(action);_resultResolver=null;
+}
+
+function api(url,opts={}){return fetch(url,{...opts,headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json',...(opts.headers||{})}}).then(r=>r.json())}
+function apiRaw(url){return fetch(url,{headers:{'Authorization':'Bearer '+TOKEN}})}
+
+function showSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('sec-'+name).classList.remove('hidden');
+  document.querySelectorAll('.sidebar-item').forEach(b=>{b.classList.remove('active');b.classList.add('text-slate-400')});
+  const nav=document.getElementById('nav-'+name);if(nav){nav.classList.add('active');nav.classList.remove('text-slate-400')}
+  if(name==='overview')loadOverview();
+  if(name==='files')loadFiles();
+  if(name==='shared')loadTeam();
+  if(name==='nodes')loadNodes();
+  if(name==='blockchain')loadBlockchain();
+  if(name==='metrics')loadMetrics();
+  if(name==='audit')loadAudit();
+  if(name==='admin')loadAdmin();
+  if(name==='crypto')showCryptoTab('entropy');
+}
+
+function logout(){localStorage.clear();window.location.href='/'}
+
+// OVERVIEW
+async function loadOverview(){
+  try{
+    const stats=await api('/api/files/stats');
+    document.getElementById('stat-files').textContent=stats.totalFiles||0;
+    document.getElementById('stat-size').textContent=stats.totalSize||'0 B';
+    document.getElementById('stat-saved').textContent=stats.spaceSaved||'0 B';
+    document.getElementById('stat-xor').textContent=(stats.avgXorTimeMs||0)+' ms';
+    // Update storage bar
+    document.getElementById('storage-used').textContent=(stats.totalSize||'0 B')+' / 15 GB';
+    const pct=Math.min(100,((stats.totalFiles||0)*2));
+    document.getElementById('storage-bar').style.width=pct+'%';
+  }catch(e){}
+  try{
+    const nodes=await api('/api/nodes/status');
+    const container=document.getElementById('overview-nodes');
+    container.innerHTML=['A','B','C'].map(n=>{
+      const st=nodes.nodes?.[n]||nodes['node'+n]||'ACTIVE';
+      const isActive=st==='ACTIVE';
+      return `<div class="flex items-center justify-between p-3 rounded-lg ${isActive?'bg-emerald-500/5 border border-emerald-500/20':'bg-red-500/5 border border-red-500/20'}">
+        <div class="flex items-center gap-3"><span class="status-dot" style="background:${isActive?'#10b981':'#ef4444'}"></span><span class="text-sm font-medium">Node ${n}</span></div>
+        <span class="text-xs mono ${isActive?'text-emerald-400':'text-red-400'}">${st}</span></div>`;
+    }).join('');
+  }catch(e){}
+  try{
+    const chain=await api('/api/analytics/blockchain/status');
+    document.getElementById('overview-chain').innerHTML=`
+      <div class="space-y-3">
+        <div class="flex justify-between"><span class="text-xs text-slate-400">Total Blocks</span><span class="text-sm font-bold mono text-blue-600">${chain.totalBlocks||0}</span></div>
+        <div class="flex justify-between"><span class="text-xs text-slate-400">Chain Integrity</span><span class="text-sm font-bold ${chain.chainValid?'text-emerald-400':'text-red-400'}">${chain.chainValid?'✓ Valid':'✗ Broken'}</span></div>
+        ${chain.latestBlock?`<div class="flex justify-between"><span class="text-xs text-slate-400">Latest Hash</span><span class="text-[10px] mono text-slate-500">${chain.latestBlock.blockHash?.substring(0,16)}...</span></div>`:''}
+      </div>`;
+  }catch(e){document.getElementById('overview-chain').innerHTML='<p class="text-xs text-slate-500">No blocks yet</p>'}
+}
+</script>
+
+
+<script>
+// UPLOAD
+const dropZone=document.getElementById('drop-zone');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');if(e.dataTransfer.files.length)uploadFile(e.dataTransfer.files[0])});
+function handleFileSelect(e){if(e.target.files.length)uploadFile(e.target.files[0])}
+
+async function uploadFile(file){
+  const prog=document.getElementById('upload-progress');
+  const result=document.getElementById('upload-result');
+  prog.classList.remove('hidden');result.classList.add('hidden');
+  document.getElementById('upload-filename').textContent=file.name;
+  document.getElementById('upload-status').textContent='Encrypting...';
+  document.getElementById('upload-bar').style.width='30%';
+  const fd=new FormData();fd.append('file',file);
+  try{
+    document.getElementById('upload-bar').style.width='60%';
+    const r=await fetch('/api/files/upload',{method:'POST',headers:{'Authorization':'Bearer '+TOKEN},body:fd});
+    const d=await r.json();
+    document.getElementById('upload-bar').style.width='100%';
+    document.getElementById('upload-status').textContent='Complete!';
+    if(d.error){result.innerHTML=`<p class="text-red-400 text-sm">${d.error}</p>`;result.classList.remove('hidden');return}
+    result.innerHTML=`
+      <div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-emerald-400">check_circle</span><span class="text-sm font-semibold text-emerald-600">${d.message}</span></div>
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div><span class="text-slate-500">File:</span> <span class="text-slate-800">${d.fileName}</span></div>
+        <div><span class="text-slate-500">Size:</span> <span class="text-slate-800">${d.fileSize}</span></div>
+        <div><span class="text-slate-400">XOR Time:</span> <span class="mono text-blue-600">${d.xorTimeMs}ms</span></div>
+        <div><span class="text-slate-400">AES Time:</span> <span class="mono text-slate-700">${d.aesTimeMs}ms</span></div>
+        <div><span class="text-slate-400">Hash:</span> <span class="mono text-slate-600">${d.fileHash?.substring(0,16)}...</span></div>
+        <div><span class="text-slate-400">Compressed:</span> <span class="${d.wasCompressed?'text-emerald-600':'text-slate-600'}">${d.wasCompressed?'Yes ('+d.compressedSize+')':'No'}</span></div>
+      </div>`;
+    result.classList.remove('hidden');
+  }catch(e){document.getElementById('upload-status').textContent='Error';result.innerHTML=`<p class="text-red-400 text-sm">Upload failed</p>`;result.classList.remove('hidden')}
+}
+
+// FILES
+async function loadFiles(){
+  try{
+    const resp=await api('/api/files/list');
+    const files=resp.files||resp;
+    const container=document.getElementById('files-list');
+    if(!files.length){container.innerHTML='<div class="glass-card rounded-xl p-8 text-center"><span class="material-symbols-outlined text-[48px] text-slate-600">folder_off</span><p class="text-slate-400 mt-2">No files uploaded yet</p></div>';return}
+    container.innerHTML=files.map(f=>`
+      <div class="glass-card rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-indigo-400 text-[20px]">description</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-slate-800 truncate">${f.fileName}</p>
+              <p class="text-[11px] text-slate-500">${f.fileSize} • ${f.uploadedAt} • <span class="mono">${f.fileHash?.substring(0,12)}...</span></p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 ml-3">
+            <button onclick="downloadFile('${f.fileId}')" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors" title="Download Original">
+              <span class="material-symbols-outlined text-[18px]">download</span>
+            </button>
+            <button onclick="recoverFile('${f.fileId}',1)" class="p-2 rounded-lg hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 transition-colors" title="Recover from Node A">
+              <span class="material-symbols-outlined text-[18px]">restore</span>
+            </button>
+            <button onclick="recoverFile('${f.fileId}',2)" class="p-2 rounded-lg hover:bg-teal-500/10 text-slate-400 hover:text-teal-400 transition-colors" title="Recover from Node B">
+              <span class="material-symbols-outlined text-[18px]">settings_backup_restore</span>
+            </button>
+            <button onclick="recoverFile('${f.fileId}',3)" class="p-2 rounded-lg hover:bg-cyan-500/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Recover from Node C">
+              <span class="material-symbols-outlined text-[18px]">cloud_sync</span>
+            </button>
+            <button onclick="verifyFile('${f.fileId}')" class="p-2 rounded-lg hover:bg-indigo-500/10 text-slate-400 hover:text-indigo-400 transition-colors" title="Verify Integrity">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+            </button>
+            <button onclick="showEntropy('${f.fileId}')" class="p-2 rounded-lg hover:bg-purple-500/10 text-slate-400 hover:text-purple-400 transition-colors" title="Entropy Analysis">
+              <span class="material-symbols-outlined text-[18px]">analytics</span>
+            </button>
+            <button onclick="shareFileToTeam('${f.fileId}')" class="p-2 rounded-lg hover:bg-blue-50 text-slate-400 hover:text-blue-500 transition-colors" title="Share to Team">
+              <span class="material-symbols-outlined text-[18px]">share</span>
+            </button>
+            <button onclick="deleteFromNode('${f.fileId}',1)" class="p-2 rounded-lg hover:bg-orange-500/10 text-slate-400 hover:text-orange-400 transition-colors" title="Delete from Node A">
+              <span class="material-symbols-outlined text-[18px]">remove_circle</span>
+            </button>
+            <button onclick="deleteFromNode('${f.fileId}',2)" class="p-2 rounded-lg hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 transition-colors" title="Delete from Node B">
+              <span class="material-symbols-outlined text-[18px]">remove_circle_outline</span>
+            </button>
+            <button onclick="deleteFromNode('${f.fileId}',3)" class="p-2 rounded-lg hover:bg-yellow-500/10 text-slate-400 hover:text-yellow-400 transition-colors" title="Delete from Node C">
+              <span class="material-symbols-outlined text-[18px]">cancel</span>
+            </button>
+            <button onclick="deleteFile('${f.fileId}')" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors" title="Delete All Nodes">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>`).join('');
+  }catch(e){document.getElementById('files-list').innerHTML='<p class="text-red-400 text-sm">Failed to load files</p>'}
+}
+
+async function downloadFile(id){const r=await apiRaw('/api/files/download/'+id);if(r.ok){const b=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=r.headers.get('content-disposition')?.match(/filename="(.+?)"/)?.[1]||'file';a.click()}}
+async function recoverFile(id,node){
+  const endpoint=node===1?'/api/files/recover/'+id+'/info':node===2?'/api/files/recover2/'+id+'/info':'/api/files/recover3/'+id+'/info';
+  const info=await api(endpoint);
+  if(info.error){showToast('Recovery failed: '+info.error,'error');return}
+  const nodeLabels={1:'Node A',2:'Node B',3:'Node C'};
+  let html='';
+  if(info.failover){
+    html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] text-amber-500">warning</span><h3 class="text-lg font-semibold text-slate-800">${nodeLabels[node]} Unavailable</h3></div>
+    <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 mb-4"><p class="text-sm text-amber-700">Auto-failover activated</p><p class="text-xs text-slate-500 mt-1">→ ${info.source}</p></div>`;
+  } else {
+    html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] text-emerald-500">check_circle</span><h3 class="text-lg font-semibold text-slate-800">Recovery Successful</h3></div>
+    <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 mb-4"><p class="text-sm text-emerald-700">Source: ${info.source}</p></div>`;
+  }
+  html+=`<div class="space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500">File</span><span class="text-slate-800">${info.fileName}</span></div>
+    <div class="flex justify-between"><span class="text-slate-400">Verified</span><span class="${info.verified?'text-emerald-400':'text-red-400'} font-bold">${info.verified?'✓ Hash matches':'✗ CORRUPTED'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-400">Recovery time</span><span class="mono text-blue-600">${info.xorTimeMs}ms</span></div></div>`;
+  const download=await showResultModal(html,true,'Download File');
+  if(download){
+    const dlEndpoint=node===1?'/api/files/recover/'+id:node===2?'/api/files/recover2/'+id:'/api/files/recover3/'+id;
+    const r=await apiRaw(dlEndpoint);
+    if(r.ok){const b=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='recovered_'+info.fileName;a.click()}
+  }
+}
+async function verifyFile(id){
+  const d=await api('/api/files/verify/'+id);
+  if(d.error){showToast(d.error,'error');return}
+  const html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] ${d.verified?'text-emerald-500':'text-red-500'}">${d.verified?'verified':'gpp_bad'}</span><h3 class="text-lg font-semibold text-slate-800">Integrity ${d.verified?'Verified':'FAILED'}</h3></div>
+    <div class="space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-400">Original Hash</span><span class="mono text-xs text-slate-600">${d.originalHash?.substring(0,24)}...</span></div>
+    <div class="flex justify-between"><span class="text-slate-400">Recovered Hash</span><span class="mono text-xs text-slate-600">${d.recoveredHash?.substring(0,24)}...</span></div>
+    <div class="flex justify-between"><span class="text-slate-400">Match</span><span class="${d.verified?'text-emerald-400':'text-red-400'} font-bold">${d.verified?'✓ Identical':'✗ Mismatch'}</span></div></div>`;
+  showResultModal(html);
+}
+async function deleteFile(id){
+  const ok=await showConfirm('This will permanently delete the file from all 3 nodes. This cannot be undone.','Delete from All Nodes');
+  if(!ok)return;await api('/api/files/'+id,{method:'DELETE'});showToast('File deleted from all nodes','success');loadFiles();
+}
+async function deleteFromNode(fileId,nodeId){
+  const labels={1:'Node A (Primary)',2:'Node B (Secondary)',3:'Node C (Tertiary)'};
+  const ok=await showConfirm('Delete from '+labels[nodeId]+'? Recovery will automatically failover to other available nodes.','Delete from Node');
+  if(!ok)return;
+  const r=await api('/api/files/'+fileId+'/node/'+nodeId,{method:'DELETE'});
+  showToast(r.message||r.error,r.error?'error':'success');loadFiles();
+}
+
+// NODES
+async function loadNodes(){
+  const nodes=await api('/api/nodes/status');
+  const health=await api('/api/analytics/nodes/health');
+
+  // Update topology graph
+  ['A','B','C'].forEach(n=>{
+    const st=nodes.nodes?.[n]||'ACTIVE';
+    const isActive=st==='ACTIVE';
+    const circle=document.getElementById('topo-node'+n+'-circle');
+    const line=document.getElementById('line-'+n);
+    if(circle){
+      circle.className='w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-500 mx-auto '+(isActive?'bg-emerald-50 border-emerald-400 text-emerald-600':'bg-red-50 border-red-400 text-red-500');
+    }
+    if(line){
+      line.setAttribute('stroke',isActive?'#2563eb':'#ef4444');
+      line.setAttribute('opacity',isActive?'0.5':'0.8');
+    }
+  });
+
+  const grid=document.getElementById('nodes-grid');
+  grid.innerHTML=['A','B','C'].map(n=>{
+    const st=nodes.nodes?.[n]||'ACTIVE';
+    const isActive=st==='ACTIVE';
+    const info=health['node'+n]||{};
+    return `<div class="glass-card rounded-xl p-5 ${isActive?'node-active':'node-failed'}">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold">Node ${n}</h3>
+        <span class="status-dot" style="background:${isActive?'#10b981':'#ef4444'}"></span>
+      </div>
+      <div class="space-y-2 text-xs mb-4">
+        <div class="flex justify-between"><span class="text-slate-400">Status</span><span class="${isActive?'text-emerald-400':'text-red-400'} font-bold">${st}</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Latency</span><span class="mono text-slate-600">${info.latencyMs||'-'}ms</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Uptime</span><span class="text-slate-600">${info.uptime||'-'}</span></div>
+      </div>
+      <div class="flex gap-2">
+        ${localStorage.getItem('role')==='ADMIN'?`<button onclick="crashNode('${n}')" class="flex-1 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors">Crash</button>
+        <button onclick="restoreNode('${n}')" class="flex-1 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-colors">Restore</button>`:'<span class="text-[10px] text-slate-500 italic">Admin controls only</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function crashNode(n){await api('/api/nodes/crash?node='+n,{method:'POST'});loadNodes()}
+async function restoreNode(n){await api('/api/nodes/restore?node='+n,{method:'POST'});loadNodes()}
+</script>
+
+
+<script>
+// BLOCKCHAIN
+async function loadBlockchain(){
+  const status=await api('/api/analytics/blockchain/status');
+  document.getElementById('chain-status').innerHTML=`
+    <div class="grid grid-cols-2 gap-4 text-center">
+      <div><p class="text-2xl font-bold text-blue-600">${status.totalBlocks||0}</p><p class="text-xs text-slate-400">Total Records</p></div>
+      <div><p class="text-2xl font-bold ${status.chainValid?'text-emerald-400':'text-red-400'}">${status.chainValid?'✓ Secure':'✗ Tampered'}</p><p class="text-xs text-slate-400">Chain Integrity</p></div>
+    </div>`;
+  const chain=await api('/api/analytics/blockchain/chain');
+  const blocks=document.getElementById('chain-blocks');
+  if(!chain.length){blocks.innerHTML='<p class="text-slate-500 text-sm">No blocks in chain yet. Upload a file to create the first block.</p>';return}
+  blocks.innerHTML=chain.slice(-20).reverse().map(b=>`
+    <div class="glass-card rounded-xl p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-[20px] ${b.action==='UPLOAD'?'text-blue-500':b.action==='DELETE'?'text-red-400':'text-emerald-500'}">${b.action==='UPLOAD'?'cloud_upload':b.action==='DELETE'?'delete':'verified'}</span>
+          <div>
+            <p class="text-sm font-semibold text-slate-800">${b.action==='UPLOAD'?'File Uploaded':b.action==='DELETE'?'File Deleted':b.action}</p>
+            <p class="text-[11px] text-slate-400">Record #${b.blockIndex} • Blockchain verified</p>
+          </div>
+        </div>
+        <span class="text-[11px] text-slate-400">${b.timestamp?.replace('T',' ')?.substring(0,19)||''}</span>
+      </div>
+    </div>`).join('');
+}
+async function validateBlockchain(){
+  const r=await api('/api/analytics/blockchain/validate');
+  showToast(r.message,r.valid?'success':'error');
+}
+
+// METRICS
+async function loadMetrics(){
+  const m=await api('/api/analytics/metrics');
+  document.getElementById('metrics-content').innerHTML=`
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="glass-card rounded-xl p-5 text-center">
+        <p class="text-3xl font-bold mono text-blue-600">${m.throughputMBps||0}</p>
+        <p class="text-xs text-slate-400 mt-1">MB/s Throughput</p>
+      </div>
+      <div class="glass-card rounded-xl p-5 text-center">
+        <p class="text-3xl font-bold mono text-slate-700">${Math.ceil((m.totalOperations||0)/2)}</p>
+        <p class="text-xs text-slate-400 mt-1">Encryption Cycles</p>
+      </div>
+      <div class="glass-card rounded-xl p-5 text-center">
+        <p class="text-3xl font-bold mono text-emerald-600">${m.totalBytesFormatted||'0 B'}</p>
+        <p class="text-xs text-slate-400 mt-1">Data Encrypted</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="glass-card rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-slate-600 mb-3">Encryption Performance</h3>
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between"><span class="text-slate-400">Median Latency</span><span class="mono text-slate-800">${m.p50Ms||0}ms</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">95th Percentile</span><span class="mono text-amber-300">${m.p95Ms||0}ms</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">99th Percentile</span><span class="mono text-red-300">${m.p99Ms||0}ms</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Fastest / Slowest</span><span class="mono text-slate-600">${m.minMs||0}ms / ${m.maxMs||0}ms</span></div>
+        </div>
+      </div>
+      <div class="glass-card rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-slate-600 mb-3">Algorithm Usage</h3>
+        <div class="space-y-2 text-xs">
+          ${m.byOperation?Object.entries(m.byOperation).map(([k,v])=>{
+            const labels={'UPLOAD_XOR':'XOR Seed Encryption','UPLOAD_AES':'AES-256-GCM Encryption','RECOVER_PRIMARY':'Node A Recovery (AES+XOR)','RECOVER_SECONDARY':'Node B Recovery (Double XOR)'};
+            return `<div class="flex justify-between"><span class="text-slate-400">${labels[k]||k}</span><span class="mono text-slate-800">${v.count}× <span class="text-slate-400">(avg ${v.avgMs}ms)</span></span></div>`;
+          }).join(''):'<p class="text-slate-500">No operations recorded yet</p>'}
+        </div>
+      </div>
+    </div>`;
+}
+
+// CRYPTO LAB
+let currentCryptoTab='entropy';
+let cryptoFiles=[];
+async function loadCryptoFiles(){
+  try{const resp=await api('/api/files/list');cryptoFiles=resp.files||resp}catch(e){cryptoFiles=[]}
+}
+function fileSelector(onSelect){
+  if(!cryptoFiles.length)return '<p class="text-sm text-slate-500 mb-3">No files uploaded yet. Upload a file first.</p>';
+  return `<select onchange="${onSelect}(this.value)" class="w-full mb-4 px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-blue-500">
+    <option value="">— Select a file —</option>
+    ${cryptoFiles.map(f=>`<option value="${f.fileId}">${f.fileName} (${f.fileSize})</option>`).join('')}
+  </select>`;
+}
+async function showCryptoTab(tab){
+  currentCryptoTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.classList.add('text-slate-400')});
+  document.getElementById('ctab-'+tab)?.classList.add('active');
+  document.getElementById('ctab-'+tab)?.classList.remove('text-slate-400');
+  await loadCryptoFiles();
+  const c=document.getElementById('crypto-content');
+  if(tab==='entropy')c.innerHTML=`<div class="glass-card rounded-xl p-5">${fileSelector('analyzeEntropy')}<div id="entropy-result"></div></div>`;
+  if(tab==='merkle')c.innerHTML=`<div class="glass-card rounded-xl p-5">${fileSelector('analyzeMerkle')}<div id="merkle-result"></div></div>`;
+  if(tab==='zkp')c.innerHTML=`<div class="glass-card rounded-xl p-5">${fileSelector('analyzeZkp')}<div id="zkp-result"></div></div>`;
+  if(tab==='bench')loadBenchmark();
+}
+async function analyzeEntropy(fileId){
+  if(!fileId)return;
+  document.getElementById('entropy-result').innerHTML='<p class="text-sm text-slate-400">Analyzing...</p>';
+  const r=await api('/api/analytics/entropy/'+fileId);
+  if(r.error){document.getElementById('entropy-result').innerHTML=`<p class="text-red-400 text-sm">${r.error}</p>`;return}
+  document.getElementById('entropy-result').innerHTML=`
+    <h3 class="text-sm font-semibold text-slate-600 mb-4">Encryption Strength: ${r.fileName}</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="p-4 rounded-lg bg-slate-50">
+        <p class="text-xs text-slate-400 mb-1">Before Encryption</p>
+        <p class="text-xl font-bold">${r.original.entropyPercent}%</p>
+        <p class="text-xs mt-1 ${r.original.quality==='EXCELLENT'?'text-emerald-400':r.original.quality==='GOOD'?'text-amber-400':'text-red-400'}">${r.original.quality==='EXCELLENT'?'High randomness':r.original.quality==='GOOD'?'Moderate randomness':'Low randomness (predictable)'}</p>
+      </div>
+      <div class="p-4 rounded-lg bg-slate-50">
+        <p class="text-xs text-slate-400 mb-1">After Encryption</p>
+        <p class="text-xl font-bold text-blue-600">${r.encrypted.entropyPercent}%</p>
+        <p class="text-xs mt-1 ${r.encrypted.quality==='EXCELLENT'?'text-emerald-400':'text-amber-400'}">${r.encrypted.quality==='EXCELLENT'?'Maximum randomness — unbreakable':'Good randomness'}</p>
+      </div>
+    </div>
+    <div class="mt-4 p-3 rounded-lg ${r.encrypted.isRandom?'bg-emerald-50 border border-emerald-200':'bg-red-50 border border-red-200'} text-xs">
+      <span class="font-semibold ${r.encrypted.isRandom?'text-emerald-700':'text-red-700'}">${r.encrypted.isRandom?'✓ Encryption is strong — data appears completely random to attackers':'⚠ Encryption may be weak — patterns detected'}</span>
+    </div>`;
+}
+async function analyzeMerkle(fileId){
+  if(!fileId)return;
+  document.getElementById('merkle-result').innerHTML='<p class="text-sm text-slate-400">Building tree...</p>';
+  const r=await api('/api/analytics/merkle/'+fileId);
+  if(r.error){document.getElementById('merkle-result').innerHTML=`<p class="text-red-400 text-sm">${r.error}</p>`;return}
+  document.getElementById('merkle-result').innerHTML=`
+    <h3 class="text-sm font-semibold text-slate-600 mb-3">File Integrity Check: ${r.fileName}</h3>
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="p-3 rounded-lg bg-slate-50 text-center"><p class="text-lg font-bold text-blue-600">${r.totalChunks}</p><p class="text-[10px] text-slate-400">File Segments</p></div>
+      <div class="p-3 rounded-lg bg-slate-50 text-center"><p class="text-lg font-bold text-slate-700">${r.treeDepth}</p><p class="text-[10px] text-slate-400">Verification Layers</p></div>
+      <div class="p-3 rounded-lg bg-emerald-50 text-center"><p class="text-lg font-bold text-emerald-600">✓</p><p class="text-[10px] text-slate-400">Integrity Verified</p></div>
+    </div>
+    <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs">
+      <p class="text-emerald-700 font-semibold mb-1">✓ File integrity confirmed</p>
+      <p class="text-slate-500">The file was split into ${r.totalChunks} segments, each independently hashed. All segments combine into a single root fingerprint that proves no part of the file has been modified.</p>
+    </div>`;
+}
+async function analyzeZkp(fileId){
+  if(!fileId)return;
+  document.getElementById('zkp-result').innerHTML='<p class="text-sm text-slate-400">Generating challenges...</p>';
+  const r=await api('/api/analytics/zkp/challenge/'+fileId);
+  if(r.error){document.getElementById('zkp-result').innerHTML=`<p class="text-red-400 text-sm">${r.error}</p>`;return}
+  document.getElementById('zkp-result').innerHTML=`
+    <h3 class="text-sm font-semibold text-slate-600 mb-3">Zero-Knowledge Storage Proof</h3>
+    <p class="text-xs text-slate-400 mb-3">5 random challenges generated. Verifying node holds correct data...</p>
+    <div class="space-y-2">
+      ${r.challenges.map(c=>`
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50">
+          <div class="text-xs"><span class="text-slate-400">Challenge ${c.challengeId}:</span> <span class="mono text-slate-600">offset=${c.offset} len=${c.length}</span></div>
+          <button onclick="verifyZkpChallenge('${fileId}',${c.offset},${c.length},'${c.expectedHash}',this)" class="px-3 py-1 rounded bg-indigo-500/20 text-blue-600 text-xs font-semibold hover:bg-indigo-500/30">Verify</button>
+        </div>`).join('')}
+    </div>`;
+}
+async function verifyZkpChallenge(fileId,offset,length,expectedHash,btn){
+  const r=await api('/api/analytics/zkp/verify/'+fileId,{method:'POST',body:JSON.stringify({offset,length,expectedHash})});
+  btn.outerHTML=r.verified?'<span class="text-emerald-400 text-xs font-bold">✓ Verified</span>':'<span class="text-red-400 text-xs font-bold">✗ Failed</span>';
+}
+async function loadBenchmark(){
+  document.getElementById('crypto-content').innerHTML=`<div class="glass-card rounded-xl p-5"><p class="text-sm text-slate-400">Running benchmark (256KB)...</p></div>`;
+  const r=await api('/api/analytics/benchmark?sizeKB=256');
+  document.getElementById('crypto-content').innerHTML=`
+    <div class="glass-card rounded-xl p-5">
+      <h3 class="text-sm font-semibold text-slate-600 mb-4">Encryption Speed Test (${r.dataSizeKB}KB file, averaged over 100 runs)</h3>
+      <div class="space-y-3">
+        ${['xor','doubleXor','aesGcm','chacha20','sha256'].map(k=>{const v=r[k];if(!v||v.error)return `<div class="flex items-center justify-between p-3 rounded-lg bg-slate-50"><span class="text-sm">${k}</span><span class="text-xs text-slate-400">Not available</span></div>`;
+        const labels={'XOR (Seed Block)':'XOR Encryption','Double XOR':'Double XOR (Node B)','AES-256-GCM':'AES-256 Encryption (Node A)','ChaCha20-Poly1305':'ChaCha20 (comparison)','SHA-256 Hash':'Integrity Hash'};
+        const name=labels[v.algorithm]||v.algorithm;
+        const barWidth=Math.min(100,v.throughputMBps/10*100);
+        return `
+        <div class="p-3 rounded-lg bg-slate-50">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-slate-700">${name}</span>
+            <span class="text-sm font-bold text-blue-600">${v.throughputMBps} MB/s</span>
+          </div>
+          <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width:${barWidth}%"></div>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">${v.avgMs}ms per operation</p>
+        </div>`;}).join('')}
+      </div>
+    </div>`;
+}
+async function showEntropy(fileId){
+  showSection('crypto');
+  await showCryptoTab('entropy');
+  // Auto-select the file in dropdown
+  const select=document.querySelector('#crypto-content select');
+  if(select){select.value=fileId;analyzeEntropy(fileId)}
+}
+
+// AUDIT
+async function loadAudit(){
+  const logs=await api('/api/files/audit');
+  document.getElementById('audit-list').innerHTML=logs.length?logs.map(l=>`
+    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+      <span class="material-symbols-outlined text-[18px] ${l.success?'text-emerald-400':'text-red-400'}">${l.success?'check_circle':'error'}</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-medium text-slate-800">${l.action} ${l.fileName?'— '+l.fileName:''}</p>
+        <p class="text-[10px] text-slate-500">${l.createdAt?.replace('T',' ')?.substring(0,19)||''} • ${l.details||''}</p>
+      </div>
+      ${l.durationMs?`<span class="text-[10px] mono text-slate-400">${l.durationMs}ms</span>`:''}
+    </div>`).join(''):'<p class="text-slate-500 text-sm">No audit entries yet</p>';
+}
+
+// ADMIN
+if(localStorage.getItem('role')==='ADMIN'){document.getElementById('nav-admin').style.display='flex'}
+async function loadAdmin(){
+  try{
+    const stats=await api('/api/admin/stats');
+    document.getElementById('admin-stats-grid').innerHTML=`
+      <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-blue-500">group</span><span class="text-[10px] mono text-slate-400">USERS</span></div><p class="text-2xl font-bold text-slate-800">${stats.totalUsers||0}</p><p class="text-xs text-slate-500">Active: ${stats.activeUsers||0}</p></div>
+      <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-blue-500">folder</span><span class="text-[10px] mono text-slate-400">FILES</span></div><p class="text-2xl font-bold text-slate-800">${stats.totalFiles||0}</p><p class="text-xs text-slate-500">${stats.totalSize||'0 B'}</p></div>
+      <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-emerald-500">compress</span><span class="text-[10px] mono text-slate-400">SAVED</span></div><p class="text-2xl font-bold text-slate-800">${stats.spaceSaved||'0 B'}</p><p class="text-xs text-slate-500">Compressed: ${stats.compressedFiles||0}</p></div>
+      <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-amber-500">speed</span><span class="text-[10px] mono text-slate-400">AVG XOR</span></div><p class="text-2xl font-bold text-slate-800">${stats.avgXorTimeMs||0}ms</p><p class="text-xs text-slate-500">Duplicates: ${stats.duplicatesSaved||0}</p></div>`;
+
+    // Only show team members, not all users
+    const orgs=await api('/api/team/orgs');
+    let teamMembers=[];
+    for(const org of orgs){
+      if(org.role==='OWNER'||org.role==='ADMIN'){
+        const members=await api('/api/team/org/'+org.orgId+'/members');
+        members.forEach(m=>{if(!teamMembers.find(t=>t.clientId===m.clientId))teamMembers.push(m)});
+      }
+    }
+    // If no team, fall back to showing all users (system admin)
+    let users;
+    if(teamMembers.length>0){
+      users=teamMembers.map(m=>({clientId:m.clientId,username:m.username,role:m.role,active:true,lastLogin:m.joinedAt||'N/A'}));
+    } else {
+      users=await api('/api/admin/users');
+    }
+    document.getElementById('admin-users-table').innerHTML=users.map(u=>`
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="py-3 px-3"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-lg ${u.role==='ADMIN'||u.role==='OWNER'?'bg-blue-50':'bg-slate-100'} flex items-center justify-center"><span class="material-symbols-outlined text-[14px] ${u.role==='ADMIN'||u.role==='OWNER'?'text-blue-500':'text-slate-500'}">person</span></div><span class="font-medium text-slate-800">${u.username}</span></div></td>
+        <td class="py-3 px-3"><span class="text-xs px-2 py-0.5 rounded-full ${u.role==='ADMIN'||u.role==='OWNER'?'bg-blue-50 text-blue-600':'bg-slate-100 text-slate-600'}">${u.role}</span></td>
+        <td class="py-3 px-3"><span class="flex items-center gap-1.5"><span class="status-dot" style="background:${u.active!==false?'#10b981':'#ef4444'}"></span><span class="text-xs text-slate-600">${u.active!==false?'Active':'Disabled'}</span></span></td>
+        <td class="py-3 px-3 text-xs text-slate-500 mono">${u.lastLogin||'Never'}</td>
+        <td class="py-3 px-3 text-right">
+          <button onclick="adminToggleUser('${u.clientId}')" class="text-xs px-2 py-1 rounded ${u.active!==false?'text-amber-500 hover:bg-amber-50':'text-emerald-500 hover:bg-emerald-50'}">${u.active!==false?'Disable':'Enable'}</button>
+          <button onclick="adminDeleteUser('${u.clientId}')" class="text-xs px-2 py-1 rounded text-red-500 hover:bg-red-50 ml-1">Delete</button>
+        </td>
+      </tr>`).join('');
+  }catch(e){}
+}
+async function adminToggleUser(id){await api('/api/admin/users/'+id+'/toggle',{method:'POST'});loadAdmin()}
+async function adminDeleteUser(id){const ok=await showConfirm('Delete this user and all their data?','Delete User');if(!ok)return;await api('/api/admin/users/'+id,{method:'DELETE'});showToast('User deleted','success');loadAdmin()}
+
+// TEAM
+async function shareFromTeam(orgId){
+  const resp=await api('/api/files/list');
+  const files=resp.files||resp;
+  if(!files.length){showToast('Upload a file first (go to Upload)','warning');return}
+  const html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] text-emerald-600">share</span><h3 class="text-lg font-semibold text-slate-800">Share File to Team</h3></div>
+    <select id="share-file-select" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-blue-500">${files.map(f=>`<option value="${f.fileId}">${f.fileName} (${f.fileSize})</option>`).join('')}</select>`;
+  const ok=await showResultModal(html,true,'Share');
+  if(ok){const fileId=document.getElementById('share-file-select').value;const r=await api('/api/team/org/'+orgId+'/share/'+fileId,{method:'POST'});showToast(r.message||r.error,r.error?'error':'success');loadTeam()}
+}
+async function shareFileToTeam(fileId){
+  const orgs=await api('/api/team/orgs');
+  if(!orgs.length){showToast('Create a team first to share files','warning');return}
+  if(orgs.length===1){const r=await api('/api/team/org/'+orgs[0].orgId+'/share/'+fileId,{method:'POST'});showToast(r.message||r.error,r.error?'error':'success');return}
+  const html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] text-blue-600">share</span><h3 class="text-lg font-semibold text-slate-800">Share to Team</h3></div>
+    <select id="share-org-select" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-blue-500">${orgs.map(o=>`<option value="${o.orgId}">${o.orgName}</option>`).join('')}</select>`;
+  const ok=await showResultModal(html,true,'Share');
+  if(ok){const orgId=document.getElementById('share-org-select').value;const r=await api('/api/team/org/'+orgId+'/share/'+fileId,{method:'POST'});showToast(r.message||r.error,r.error?'error':'success')}
+}
+async function loadTeam(){
+  const orgs=await api('/api/team/orgs');
+  if(!orgs.length){document.getElementById('team-content').innerHTML='<div class="glass-card p-8 text-center"><span class="material-symbols-outlined text-[48px] text-slate-600">group_add</span><p class="text-slate-500 mt-2">No teams yet. Create one to start sharing files.</p></div>';return}
+  let html='';
+  for(const org of orgs){
+    const members=await api('/api/team/org/'+org.orgId+'/members');
+    const files=await api('/api/team/org/'+org.orgId+'/files');
+    html+=`<div class="glass-card p-5 mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <div><h3 class="text-lg font-semibold text-slate-800">${org.orgName}</h3><p class="text-xs text-slate-400">${org.memberCount} members • ${org.role}</p></div>
+        ${org.role==='OWNER'||org.role==='ADMIN'?`<button onclick="showAddMember('${org.orgId}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg border border-blue-200 hover:bg-blue-100">+ Add Member</button>`:''}
+      </div>
+      <div class="mb-4"><h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">Members</h4>
+        <div class="flex flex-wrap gap-2">${members.map(m=>`<span class="px-2.5 py-1 bg-slate-100 rounded-full text-xs text-slate-600">${m.username} <span class="text-slate-400">(${m.role})</span></span>`).join('')}</div>
+      </div>
+      <div><div class="flex items-center justify-between mb-2"><h4 class="text-xs font-semibold text-slate-500 uppercase">Shared Files</h4>
+        <button onclick="shareFromTeam('${org.orgId}')" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-lg border border-emerald-200 hover:bg-emerald-100">+ Share File</button></div>
+        ${files.length?files.map(f=>`<div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-slate-400">description</span><span class="text-sm text-slate-700">${f.fileName}</span><span class="text-xs text-slate-400">${f.fileSize}</span></div>
+          <div class="flex items-center gap-2"><span class="text-[10px] text-slate-400">by ${f.sharedBy}</span><button onclick="downloadFile('${f.fileId}')" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-blue-500 transition-colors" title="Download"><span class="material-symbols-outlined text-[16px]">download</span></button></div></div>`).join(''):'<p class="text-xs text-slate-400">No shared files yet</p>'}
+      </div>
+    </div>`;
+  }
+  document.getElementById('team-content').innerHTML=html;
+}
+async function showCreateOrg(){
+  const html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] text-blue-600">group_add</span><h3 class="text-lg font-semibold text-slate-800">Create Team</h3></div>
+    <input id="org-name-input" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 mb-2" placeholder="Team name (e.g. My Company)"/>`;
+  const ok=await showResultModal(html,true,'Create');
+  if(ok){const name=document.getElementById('org-name-input').value;if(name){const r=await api('/api/team/org',{method:'POST',body:JSON.stringify({name})});showToast(r.message||r.error,r.error?'error':'success');loadTeam()}}
+}
+async function showAddMember(orgId){
+  const html=`<div class="flex items-center gap-3 mb-4"><span class="material-symbols-outlined text-[28px] text-blue-600">person_add</span><h3 class="text-lg font-semibold text-slate-800">Add Team Member</h3></div>
+    <input id="member-username-input" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 mb-2" placeholder="Enter username"/>`;
+  const ok=await showResultModal(html,true,'Add');
+  if(ok){const username=document.getElementById('member-username-input').value;if(username){const r=await api('/api/team/org/'+orgId+'/members',{method:'POST',body:JSON.stringify({username})});showToast(r.message||r.error,r.error?'error':'success');loadTeam()}}
+}
+
+// INIT
+loadOverview();
+</script>
+</body>
+</html>

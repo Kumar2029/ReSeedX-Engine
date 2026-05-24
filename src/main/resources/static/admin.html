@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Panel - ReSeedX Engine v4.0</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif;scrollbar-width:thin}
+.mono{font-family:'JetBrains Mono',monospace}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+body{background:#f8fafc}
+.glass-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;transition:all 0.2s}
+.glass-card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.gradient-text{color:#2563eb;font-weight:700}
+.status-dot{width:8px;height:8px;border-radius:50%;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.5}}
+</style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased p-6">
+
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[24px] text-white">settings</span>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Admin Control Panel</h1>
+        <p class="text-sm text-slate-500">System management & user administration</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/dashboard.html" class="glass-card px-4 py-2 text-xs text-slate-600 hover:text-slate-800 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]">dashboard</span> Dashboard
+      </a>
+      <button onclick="logout()" class="glass-card px-4 py-2 text-xs text-red-500 hover:text-red-600 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px]">logout</span> Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- System Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" id="admin-stats"></div>
+
+  <!-- Users Table -->
+  <div class="glass-card rounded-xl p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold flex items-center gap-2"><span class="material-symbols-outlined text-indigo-400">group</span> User Management</h2>
+      <button onclick="loadAdmin()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">refresh</span> Refresh</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-xs text-slate-400 uppercase tracking-wider border-b border-slate-700">
+          <th class="text-left py-3 px-3">User</th><th class="text-left py-3 px-3">Role</th><th class="text-left py-3 px-3">Status</th><th class="text-left py-3 px-3">Last Login</th><th class="text-right py-3 px-3">Actions</th>
+        </tr></thead>
+        <tbody id="users-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Blockchain + Performance -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="glass-card rounded-xl p-6">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-purple-400">link</span> Blockchain Status</h2>
+      <div id="admin-chain"></div>
+    </div>
+    <div class="glass-card rounded-xl p-6">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400">monitoring</span> Performance</h2>
+      <div id="admin-perf"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOKEN=localStorage.getItem('token');
+if(!TOKEN||localStorage.getItem('role')!=='ADMIN')window.location.href='/';
+function api(url,opts={}){return fetch(url,{...opts,headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json',...(opts.headers||{})}}).then(r=>r.json())}
+function logout(){localStorage.clear();window.location.href='/'}
+
+async function loadAdmin(){
+  // Stats
+  const stats=await api('/api/admin/stats');
+  document.getElementById('admin-stats').innerHTML=`
+    <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-indigo-400">group</span><span class="text-[10px] mono text-slate-500">USERS</span></div><p class="text-2xl font-bold">${stats.totalUsers||0}</p><p class="text-xs text-slate-400">Active: ${stats.activeUsers||0}</p></div>
+    <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-purple-400">folder</span><span class="text-[10px] mono text-slate-500">FILES</span></div><p class="text-2xl font-bold">${stats.totalFiles||0}</p><p class="text-xs text-slate-400">${stats.totalSize||'0 B'}</p></div>
+    <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-emerald-400">compress</span><span class="text-[10px] mono text-slate-500">SAVED</span></div><p class="text-2xl font-bold">${stats.spaceSaved||'0 B'}</p><p class="text-xs text-slate-400">Compressed: ${stats.compressedFiles||0}</p></div>
+    <div class="glass-card rounded-xl p-5"><div class="flex items-center justify-between mb-2"><span class="material-symbols-outlined text-amber-400">speed</span><span class="text-[10px] mono text-slate-500">AVG XOR</span></div><p class="text-2xl font-bold">${stats.avgXorTimeMs||0}ms</p><p class="text-xs text-slate-400">Duplicates saved: ${stats.duplicatesSaved||0}</p></div>`;
+
+  // Users
+  const users=await api('/api/admin/users');
+  document.getElementById('users-table').innerHTML=users.map(u=>`
+    <tr class="border-b border-slate-800 hover:bg-slate-800/30">
+      <td class="py-3 px-3"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-lg ${u.role==='ADMIN'?'bg-purple-500/20':'bg-indigo-500/20'} flex items-center justify-center"><span class="material-symbols-outlined text-[14px] ${u.role==='ADMIN'?'text-purple-400':'text-indigo-400'}">person</span></div><span class="font-medium">${u.username}</span></div></td>
+      <td class="py-3 px-3"><span class="text-xs px-2 py-0.5 rounded-full ${u.role==='ADMIN'?'bg-purple-500/20 text-purple-300':'bg-slate-700 text-slate-300'}">${u.role}</span></td>
+      <td class="py-3 px-3"><span class="flex items-center gap-1.5"><span class="status-dot" style="background:${u.active?'#10b981':'#ef4444'}"></span><span class="text-xs">${u.active?'Active':'Disabled'}</span></span></td>
+      <td class="py-3 px-3 text-xs text-slate-400 mono">${u.lastLogin||'Never'}</td>
+      <td class="py-3 px-3 text-right">
+        <button onclick="toggleUser('${u.clientId}')" class="text-xs px-2 py-1 rounded ${u.active?'text-amber-400 hover:bg-amber-500/10':'text-emerald-400 hover:bg-emerald-500/10'}">${u.active?'Disable':'Enable'}</button>
+        <button onclick="deleteUser('${u.clientId}')" class="text-xs px-2 py-1 rounded text-red-400 hover:bg-red-500/10 ml-1">Delete</button>
+      </td>
+    </tr>`).join('');
+
+  // Blockchain
+  try{const chain=await api('/api/analytics/blockchain/status');
+  document.getElementById('admin-chain').innerHTML=`<div class="space-y-3"><div class="flex justify-between"><span class="text-sm text-slate-400">Blocks</span><span class="font-bold mono text-indigo-300">${chain.totalBlocks}</span></div><div class="flex justify-between"><span class="text-sm text-slate-400">Integrity</span><span class="font-bold ${chain.chainValid?'text-emerald-400':'text-red-400'}">${chain.chainValid?'Valid':'BROKEN'}</span></div></div>`}catch(e){}
+
+  // Performance
+  try{const m=await api('/api/analytics/metrics');
+  document.getElementById('admin-perf').innerHTML=`<div class="space-y-3"><div class="flex justify-between"><span class="text-sm text-slate-400">Throughput</span><span class="font-bold mono text-indigo-300">${m.throughputMBps||0} MB/s</span></div><div class="flex justify-between"><span class="text-sm text-slate-400">Operations</span><span class="font-bold mono">${m.totalOperations||0}</span></div><div class="flex justify-between"><span class="text-sm text-slate-400">P95 Latency</span><span class="font-bold mono text-amber-300">${m.p95Ms||0}ms</span></div></div>`}catch(e){}
+}
+
+async function toggleUser(id){await api('/api/admin/users/'+id+'/toggle',{method:'POST'});loadAdmin()}
+async function deleteUser(id){if(!confirm('Delete this user?'))return;await api('/api/admin/users/'+id,{method:'DELETE'});loadAdmin()}
+
+loadAdmin();
+</script>
+</body>
+</html>

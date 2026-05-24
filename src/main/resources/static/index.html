@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReSeedX Engine — Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+body{background:#f8fafc}
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center antialiased">
+
+<main class="w-full max-w-sm mx-4">
+  <!-- Logo & Title -->
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 mb-4">
+      <span class="material-symbols-outlined text-[28px] text-white">cloud</span>
+    </div>
+    <h1 class="text-2xl font-semibold text-slate-800">ReSeedX Engine</h1>
+    <p class="text-sm text-slate-500 mt-1">Sign in to your account</p>
+  </div>
+
+  <!-- Card -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+    <div id="alert-area" class="mb-4"></div>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-slate-200 mb-6">
+      <button id="tab-login" onclick="switchTab('login')" class="flex-1 pb-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600">Sign In</button>
+      <button id="tab-register" onclick="switchTab('register')" class="flex-1 pb-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-600">Create Account</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="form-login">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+          <input id="lu" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="Enter your username" type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+          <input id="lp" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="Enter your password" type="password"/>
+        </div>
+        <button onclick="doLogin()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium text-sm transition-colors">
+          Sign In
+        </button>
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div id="form-register" class="hidden">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+          <input id="ru" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="Choose a username" type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+          <input id="rp" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="Min 8 chars, 1 uppercase, 1 number" type="password"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Account Type</label>
+          <select id="reg-role" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
+            <option value="false">Personal</option>
+            <option value="true">Organization Admin</option>
+          </select>
+        </div>
+        <button onclick="doRegister()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium text-sm transition-colors">
+          Create Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-center text-xs text-slate-400 mt-6">End-to-end encrypted • Distributed across 3 nodes</p>
+</main>
+
+<script>
+function switchTab(t){
+  document.getElementById('form-login').classList.toggle('hidden',t!=='login');
+  document.getElementById('form-register').classList.toggle('hidden',t!=='register');
+  document.getElementById('tab-login').className=t==='login'?'flex-1 pb-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600':'flex-1 pb-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-600';
+  document.getElementById('tab-register').className=t==='register'?'flex-1 pb-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600':'flex-1 pb-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-600';
+}
+function showAlert(msg,type){
+  const a=document.getElementById('alert-area');
+  const colors=type==='success'?'bg-emerald-50 border-emerald-200 text-emerald-700':'bg-red-50 border-red-200 text-red-700';
+  a.innerHTML=`<div class="${colors} border rounded-lg px-4 py-2.5 text-sm">${msg}</div>`;
+  setTimeout(()=>a.innerHTML='',5000);
+}
+async function doLogin(){
+  const u=document.getElementById('lu').value,p=document.getElementById('lp').value;
+  if(!u||!p)return showAlert('Please fill in all fields','error');
+  try{
+    const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok)return showAlert(d.error||'Login failed','error');
+    localStorage.setItem('token',d.token);localStorage.setItem('username',d.username);localStorage.setItem('role',d.role);
+    showAlert('Welcome back!','success');
+    setTimeout(()=>window.location.href='/dashboard.html',600);
+  }catch(e){showAlert('Connection error','error')}
+}
+async function doRegister(){
+  const u=document.getElementById('ru').value,p=document.getElementById('rp').value,isAdmin=document.getElementById('reg-role').value;
+  if(!u||!p)return showAlert('Please fill in all fields','error');
+  try{
+    const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p,isAdmin:isAdmin})});
+    const d=await r.json();
+    if(!r.ok)return showAlert(d.error||'Registration failed','error');
+    showAlert('Account created! Please sign in.','success');switchTab('login');
+  }catch(e){showAlert('Connection error','error')}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('form-login').classList.contains('hidden')?doRegister():doLogin()}});
+if(localStorage.getItem('token')){window.location.href='/dashboard.html'}
+</script>
+</body>
+</html>
